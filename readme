@@ -1,194 +1,436 @@
-# LawBot – RAG + LLM + AI Legal Aid
+# ⚖️ LawBot – RAG + LLM + AI Legal Assistant
 
-LawBot is a Retrieval-Augmented Generation (RAG) based AI Legal Assistant designed to provide context-grounded answers from uploaded legal PDF documents. The system ensures responses are strictly derived from document content, minimizing hallucinations and improving reliability for legal research and analysis.
+LawBot is a **Retrieval-Augmented Generation (RAG)** based AI Legal Assistant designed to provide context-grounded answers from uploaded legal PDF documents.
 
-The architecture supports both local and cloud-based large language models, making it flexible for development, experimentation, and deployment.
+Instead of relying only on an LLM's pretrained knowledge, LawBot retrieves relevant information from legal documents and uses that context to generate answers. This helps reduce hallucinations and keeps responses grounded in the provided documents.
 
----
+The system supports both **local LLMs using Ollama** and **cloud-based LLMs using Groq API**.
 
-## Overview
-
-LawBot enables the users to:
-
-- Upload legal documents (acts, case files, contracts, policies, etc.)
-- Perform semantic search over document content
-- Generate context-aware answers using a configurable LLM backend
-- Operate fully offline using local models or leverage a cloud LLM via API
-
-The system follows a modular RAG pipeline separating document processing, retrieval, and generation layers.
+> ⚠️ **Disclaimer:** LawBot is an AI-assisted legal research tool and does not provide professional legal advice. Important legal information should always be verified using authoritative legal sources or with a qualified legal professional.
 
 ---
 
-## System Architecture
+## 🚀 Features
 
-<img width="1726" height="2543" alt="Flowchart" src="https://github.com/user-attachments/assets/557569e6-3006-40f5-b33b-e6f7789c85f1" />
-
-
----
-
-## Core Features
-
-- PDF ingestion and text extraction
-- Recursive chunking with overlap for better semantic retrieval
-- Embedding generation using Ollama
-- FAISS-based vector similarity search
-- Configurable LLM backend (Local or Groq API)
-- Strict prompt design to prevent hallucinated responses
-- Persistent local vector storage
-
----
-
-## System Workflow
-
-### Document Processing Phase
-1. Upload PDF document.
-2. Extract text using PDFPlumber.
-3. Split text into overlapping chunks.
-4. Generate embeddings using `nomic-embed-text`.
-5. Store embeddings in a FAISS vector index.
-
-### Query Processing Phase
-1. User submits a question.
-2. FAISS performs Top-K similarity retrieval.
-3. Retrieved chunks are aggregated as context.
-4. Context is injected into a structured prompt.
-5. Selected LLM generates a grounded response.
+- 📄 Upload and process legal PDF documents
+- 🔎 Semantic search over document content
+- 🧠 Retrieval-Augmented Generation (RAG)
+- 📚 PDF text extraction using PDFPlumber
+- ✂️ Recursive text chunking with overlap
+- 🔢 Embedding generation using Ollama
+- 🗂️ FAISS-based vector similarity search
+- 🤖 Local LLM support using Ollama
+- ☁️ Cloud LLM support using Groq API
+- 🛡️ Context-grounded responses
+- 🚫 Hallucination-reduction prompting
+- 💾 Persistent local vector storage
+- 🖥️ Streamlit web interface
 
 ---
 
-## Technology Stack
+## 🏗️ System Architecture
+
+```text
+                    ┌─────────────────────┐
+                    │     Legal PDF       │
+                    │      Document       │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │    PDF Extraction   │
+                    │      PDFPlumber     │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │    Text Chunking    │
+                    │  Recursive Splitter │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │     Embeddings      │
+                    │       Ollama        │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │    FAISS Vector     │
+                    │       Store         │
+                    └──────────┬──────────┘
+                               │
+                        User Question
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │ Semantic Retrieval  │
+                    │       Top-K         │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │ Retrieved Context   │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │    LLM Generation   │
+                    │ Ollama / Groq API   │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │  Grounded Legal     │
+                    │      Answer         │
+                    └─────────────────────┘
+```
+
+---
+
+## 🔄 How It Works
+
+### Document Processing
+
+1. User uploads a legal PDF.
+2. PDFPlumber extracts the document text.
+3. The text is divided into smaller overlapping chunks.
+4. Each chunk is converted into an embedding.
+5. Embeddings are stored in a FAISS vector index.
+
+### Query Processing
+
+1. User enters a legal question.
+2. The question is converted into an embedding.
+3. FAISS performs a similarity search.
+4. Relevant document chunks are retrieved.
+5. Retrieved chunks are added to the prompt as context.
+6. The selected LLM generates a grounded response.
+
+```text
+User Question
+      │
+      ▼
+Question Embedding
+      │
+      ▼
+FAISS Similarity Search
+      │
+      ▼
+Relevant Document Chunks
+      │
+      ▼
+Context + Question
+      │
+      ▼
+LLM
+      │
+      ▼
+Grounded Answer
+```
+
+---
+
+## 🧰 Technology Stack
 
 | Layer | Technology |
-|--------|------------|
+|---|---|
 | Frontend | Streamlit |
-| Orchestration | LangChain |
-| Vector Store | FAISS |
+| Programming Language | Python |
+| RAG Framework | LangChain |
+| Vector Database | FAISS |
+| PDF Processing | PDFPlumber |
 | Embeddings | Ollama (`nomic-embed-text`) |
 | Local LLM | Ollama (`deepseek-r1:1.5b`) |
 | Cloud LLM | Groq API (`llama-3.3-70b-versatile`) |
-| PDF Loader | PDFPlumber |
+| Environment Variables | python-dotenv |
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
-```
+```text
 LawBot/
 │
-├── frontend.py           # Streamlit application
-├── rag_pipeline.py       # Retrieval and LLM integration
-├── vector_database.py    # PDF processing and FAISS management
+├── frontend.py
+│   └── Streamlit application
+│
+├── rag_pipeline.py
+│   └── RAG pipeline and LLM integration
+│
+├── vector_database.py
+│   └── PDF processing and FAISS management
+│
 ├── requirements.txt
-├── pdfs/                 # Uploaded documents
-└── vectorstore/          # Persisted FAISS index
+│   └── Python dependencies
+│
+├── README.md
+│   └── Project documentation
+│
+├── pdfs/
+│   └── Legal PDF documents
+│
+└── vectorstore/
+    └── Persisted FAISS vector index
 ```
 
 ---
 
-## Installation
+# ⚙️ Installation
 
-### 1. Clone the Repository
+## 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
-cd LawBot
+git clone https://github.com/Aviral-2004/lawbot.git
+cd lawbot
 ```
 
-### 2. Create Virtual Environment
+---
 
-```bash
+## 2. Create a Virtual Environment
+
+### Windows
+
+```powershell
 python -m venv venv
 ```
 
 Activate the environment:
 
-Windows:
-```bash
+```powershell
 venv\Scripts\activate
 ```
 
-Mac/Linux:
+### macOS / Linux
+
 ```bash
+python3 -m venv venv
 source venv/bin/activate
 ```
 
-### 3. Install Dependencies
+---
 
-Create `requirements.txt`:
-
-```
-streamlit
-python-dotenv
-langchain
-langchain-community
-langchain-core
-langchain-ollama
-langchain-text-splitters
-faiss-cpu
-pdfplumber
-langchain-groq
-```
-
-Install dependencies:
+## 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Local LLM Setup (Ollama)
+---
+
+# 🤖 Local LLM Setup with Ollama
+
+LawBot can run locally using Ollama.
 
 Install Ollama from:
 
 https://ollama.com/download
 
-Pull required models:
+Then download the required models:
 
 ```bash
 ollama pull deepseek-r1:1.5b
+```
+
+```bash
 ollama pull nomic-embed-text
 ```
 
-### 5. Cloud LLM Setup (Groq)
+Make sure Ollama is running before starting the application.
 
-1. Create a `.env` file:
+---
 
-```
+# ☁️ Groq API Setup
+
+LawBot can also use a cloud-based LLM through Groq.
+
+Create a `.env` file in the project root:
+
+```env
 GROQ_API_KEY=your_api_key_here
 ```
 
-2. In `rag_pipeline.py`, enable Groq:
+Never upload your actual API key to GitHub.
 
-```python
-from langchain_groq import ChatGroq
-llm_model = ChatGroq(model="llama-3.3-70b-versatile")
+Your `.gitignore` should include:
+
+```gitignore
+.env
+venv/
+.venv/
+__pycache__/
+*.pyc
 ```
 
 ---
 
-## Running the Application
+# ▶️ Running the Application
+
+Start the Streamlit application:
 
 ```bash
 streamlit run frontend.py
 ```
 
-Access the application at:
+The application will be available at:
 
-```
+```text
 http://localhost:8501
+```
+
+Open the URL in your browser.
+
+---
+
+# 💬 Using LawBot
+
+```text
+1. Start LawBot
+       ↓
+2. Upload a legal PDF
+       ↓
+3. PDF is processed
+       ↓
+4. Text is split into chunks
+       ↓
+5. Embeddings are generated
+       ↓
+6. FAISS index is created
+       ↓
+7. Ask a legal question
+       ↓
+8. Relevant passages are retrieved
+       ↓
+9. LLM generates an answer
+       ↓
+10. Grounded answer is displayed
 ```
 
 ---
 
-## Reliability and Hallucination Control
+# 🛡️ Hallucination Control
 
-The prompt design enforces:
+LawBot uses a context-grounded prompting strategy to reduce unsupported responses.
 
-- Strict use of provided context
-- No fabricated legal information
-- A fallback response:
+The system instructs the LLM to:
 
+- Use the retrieved document context.
+- Avoid inventing information.
+- Avoid unsupported legal claims.
+- Answer only when sufficient context is available.
+- Clearly state when the information cannot be found in the provided document.
+
+When the required information is unavailable, the system can respond:
+
+```text
+I don't know based on the provided document.
 ```
-"I don't know based on the provided document."
+
+This approach helps keep generated responses connected to the source documents.
+
+---
+
+# 🔍 RAG Pipeline
+
+```text
+PDF
+ │
+ ▼
+Text Extraction
+ │
+ ▼
+Text Chunking
+ │
+ ▼
+Embedding Generation
+ │
+ ▼
+FAISS Index
+ │
+ ▼
+Similarity Search
+ │
+ ▼
+Top-K Relevant Chunks
+ │
+ ▼
+Context Construction
+ │
+ ▼
+LLM
+ │
+ ▼
+Answer
 ```
 
-This ensures document-grounded, reliable outputs suitable for legal assistance workflows.
+---
+
+# 🧩 Main Components
+
+### `frontend.py`
+
+Handles:
+
+- Streamlit interface
+- PDF upload
+- User questions
+- Displaying responses
+
+### `vector_database.py`
+
+Handles:
+
+- PDF ingestion
+- Text extraction
+- Text chunking
+- Embedding generation
+- FAISS vector storage
+
+### `rag_pipeline.py`
+
+Handles:
+
+- Query processing
+- Similarity retrieval
+- Context construction
+- LLM interaction
+- Response generation
+
+---
+
+# 🔮 Future Improvements
+
+- 📌 Source citations with page numbers
+- 📚 Multi-document conversations
+- 🔐 User authentication
+- 🌐 Web deployment
+- 🗄️ Cloud vector database support
+- 🧠 Larger local language models
+- 📊 Retrieval evaluation and benchmarking
+- 💬 Conversation history
+- 🌍 Multilingual legal document support
+- 🔎 Hybrid keyword + semantic search
+- 📄 Support for additional document formats
+
+---
+
+# ⚠️ Legal Disclaimer
+
+LawBot is an **AI-assisted legal research and document analysis tool**.
+
+It is not a substitute for a qualified lawyer, advocate, or other legal professional. AI-generated responses may contain errors or omissions. Important information should be independently verified against the original legal documents and authoritative legal sources.
+
+---
+
+# 👨‍💻 Author
+
+**Aviral-2004**
+
+GitHub:  
+https://github.com/Aviral-2004
+
+---
+
+## ⭐ Support
+
+If you find this project useful, consider giving the repository a ⭐ on GitHub.
